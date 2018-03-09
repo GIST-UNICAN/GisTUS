@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">GisTUS</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="preference_file_key">archivo_preferencias</string>
+    <string name="PREFERENCES_TOKEN">preferencias_token</string>
+    <string name="PREFERENCES_USER">preferencias_user</string>
+    <string name="loading_message">cargando...</string>
+    <string name="error_icon_description">Error al cargar los datos</string>
+    <string name="error_message">Error al cargar los datos</string>
+
 </resources>
