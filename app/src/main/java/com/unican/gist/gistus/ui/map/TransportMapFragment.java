@@ -22,6 +22,8 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.kml.KmlLayer;
+import com.unican.gist.gistus.R;
+import com.unican.gist.gistus.domain.Constants;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -42,10 +44,7 @@ import javax.net.ssl.X509TrustManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import gist.unican.com.encuestaapp.R;
-import gist.unican.com.encuestaapp.domain.DataPersistance.RestoreFromLocalDatabase;
-import gist.unican.com.encuestaapp.domain.Utils.OrderLists;
-import gist.unican.com.encuestaapp.domain.model.BusLinesObjectItem;
+
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -66,6 +65,7 @@ public class TransportMapFragment extends Fragment {
     private Boolean primeraVez = true;
     private String url_actualizar = "espiras/programa_ejecutar/lineas_bus.kml";
     private String archivo_actualizar = "archivo.kml";
+    private String xml_lineas ="espiras/programa_ejecutar/xml_lineas_bus.xml";
 
     @Nullable
     @BindView(R.id.loading_layout)
@@ -225,7 +225,6 @@ public class TransportMapFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-
                         showError();
                     }
 
@@ -355,23 +354,9 @@ public class TransportMapFragment extends Fragment {
 
     private void loadSpinnerToolbar() {
         //hay que componer el spinner selector de lineas
-        RestoreFromLocalDatabase restoreFromLocalDatabase = new RestoreFromLocalDatabase();
-        List<BusLinesObjectItem> busLinesObject = new ArrayList<>();
-        List<String> listaDescarga = new ArrayList<>();
-        try {
-            busLinesObject = restoreFromLocalDatabase.busLines();
-            OrderLists orderLists = new OrderLists();
-            busLinesObject = orderLists.orderBusLines(busLinesObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (busLinesObject.size() != 0) {
-            for (BusLinesObjectItem busLinesObjectItem : busLinesObject) {
-                String linea = busLinesObjectItem.getDcName().replace("/", "-");
-                listaDescarga.add(busLinesObjectItem.getAytoNumero() + " " + linea);
-            }
-        }
-        listaDescarga.add(0, "Todas las Líneas");
+        Constants constantes= new Constants();
+        List listaDescarga = constantes.lineas_mostrar;
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.spinner, listaDescarga);
         adapter.setDropDownViewResource(R.layout.spinner);
         linesSpinner.setVisibility(View.VISIBLE);

@@ -36,6 +36,8 @@ public class Utils {
         editor.remove(context.getString(R.string.PREFERENCES_USER)).commit();
     }
 
+
+
     public static String encrypt(String input) {
         // Simple encryption, not very strong!
         return Base64.encodeToString(input.getBytes(), Base64.DEFAULT);
