@@ -184,33 +184,26 @@ public class TransportMapFragment extends Fragment {
                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        TextView msg = new TextView(getContext());
-                        msg.setText(Html.fromHtml(marker.getSnippet()));
-                        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
-                        ab.setTitle(marker.getTitle());
-                        ab.setView(msg);
-                        ab.setCancelable(true);
-                        ab.show();
 
 
                         new FancyAlertDialog.Builder(getActivity())
                                 .setTitle(marker.getTitle())
                                 .setBackgroundColor(Color.parseColor("#303F9F"))  //Don't pass R.color.colorvalue
-                                .setMessage("Do you really want to Exit ?")
+                                .setMessage(Html.fromHtml(marker.getSnippet()).toString())
                                 .setPositiveBtnBackground(Color.parseColor("#FF4081"))  //Don't pass R.color.colorvalue
-                                .setPositiveBtnText("Rate")
-                                .setNegativeBtnBackground(Color.parseColor("#FFA9A7A8"))  //Don't pass R.color.colorvalue
+                                .setNegativeBtnText("")
+                                .setPositiveBtnText("Cerrar")
+                                .setNegativeBtnBackground(Color.parseColor("#ffffff"))  //Don't pass R.color.colorvalue
                                 .setAnimation(Animation.POP)
-                                .isCancellable(true)
-                                .setIcon(R.drawable.ic_star_border_black_24dp, Icon.Visible)
+                                .isCancellable(false)
+                                .setIcon(R.drawable.ic_info, Icon.Visible)
                                 .OnPositiveClicked(new FancyAlertDialogListener() {
                                     @Override
                                     public void OnClick() {
-                                        Toast.makeText(getContext(),"Rate",Toast.LENGTH_SHORT).show();
+                                        downloadFile(url_actualizar, archivo_actualizar);
                                     }
                                 })
                                 .build();
-
 
 
                         return false;
@@ -438,7 +431,7 @@ public class TransportMapFragment extends Fragment {
     }
 
     private static final CharSequence[] MAP_TYPE_ITEMS =
-            {"Mapa",  "Satélite", "Terreno","Híbrido"};
+            {"Mapa", "Satélite", "Terreno", "Híbrido"};
 
     private void showMapTypeSelectorDialog() {
         // Prepare the dialog by setting up a Builder.
@@ -447,7 +440,7 @@ public class TransportMapFragment extends Fragment {
         builder.setTitle(fDialogTitle);
 
         // Find the current map type to pre-check the item representing the current state.
-        int checkItem = map.getMapType()-1;
+        int checkItem = map.getMapType() - 1;
 
         // Add an OnClickListener to the dialog, so that the selection will be handled.
         builder.setSingleChoiceItems(
