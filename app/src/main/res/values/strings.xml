@@ -10,5 +10,8 @@
     <string name="loading_message">cargando...</string>
     <string name="error_icon_description">Error al cargar los datos</string>
     <string name="error_message">Error al cargar los datos</string>
+    <string name="refresco">Actualizando</string>
+    <string name="change_map">Cambiar mapa</string>
+    <string name="select_map">Seleccionar tipo de mapa</string>
 
 </resources>

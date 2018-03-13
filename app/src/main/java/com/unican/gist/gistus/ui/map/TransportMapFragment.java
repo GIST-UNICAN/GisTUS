@@ -1,11 +1,20 @@
 package com.unican.gist.gistus.ui.map;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +31,13 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.kml.KmlLayer;
+import com.serhatsurguvec.continuablecirclecountdownview.ContinuableCircleCountDownView;
+import com.shashank.sony.fancydialoglib.Animation;
+import com.shashank.sony.fancydialoglib.FancyAlertDialog;
+import com.shashank.sony.fancydialoglib.FancyAlertDialogListener;
+import com.shashank.sony.fancydialoglib.Icon;
 import com.unican.gist.gistus.R;
 import com.unican.gist.gistus.domain.Constants;
 
@@ -32,7 +48,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,6 +70,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import zlc.season.rxdownload2.RxDownload;
 import zlc.season.rxdownload2.entity.DownloadStatus;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -65,7 +82,7 @@ public class TransportMapFragment extends Fragment {
     private Boolean primeraVez = true;
     private String url_actualizar = "espiras/programa_ejecutar/lineas_bus.kml";
     private String archivo_actualizar = "archivo.kml";
-    private String xml_lineas ="espiras/programa_ejecutar/xml_lineas_bus.xml";
+    private String xml_lineas = "espiras/programa_ejecutar/xml_lineas_bus.xml";
 
     @Nullable
     @BindView(R.id.loading_layout)
@@ -78,6 +95,10 @@ public class TransportMapFragment extends Fragment {
     @Nullable
     @BindView(R.id.lines_spinner)
     Spinner linesSpinner;
+
+    @Nullable
+    @BindView(R.id.circleCountDownView)
+    ContinuableCircleCountDownView circleCountDownView;
 
 
     public TransportMapFragment() {
@@ -93,6 +114,20 @@ public class TransportMapFragment extends Fragment {
         loadSpinnerToolbar();
         mapView = (MapView) view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+        //listener para el refresco, aunque no se usa
+        circleCountDownView.setListener(new ContinuableCircleCountDownView.OnCountDownCompletedListener() {
+            @Override
+            public void onTick(long passedMillis) {
+                Log.w(TAG, "Tick." + passedMillis);
+            }
+
+            @Override
+            public void onCompleted() {
+                Log.w(TAG, "Completed.");
+            }
+        });
+        circleCountDownView.setTimer(20000);
+        circleCountDownView.start();
         //capturamos el spinner
         linesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -116,7 +151,9 @@ public class TransportMapFragment extends Fragment {
 
             }
         });
-
+        ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        Log.d("AB", ab.getTitle().toString());
+        setHasOptionsMenu(true);
         return view;
 
     }
@@ -139,36 +176,75 @@ public class TransportMapFragment extends Fragment {
             e.printStackTrace();
         }
 
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 map = mMap;
-                CameraUpdate center =
-                        CameraUpdateFactory.newLatLng(new LatLng(43.4722,
-                                -3.8199));
-                CameraUpdate zoom = CameraUpdateFactory.zoomTo(12);
+                //hacemos los markes clickables
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        TextView msg = new TextView(getContext());
+                        msg.setText(Html.fromHtml(marker.getSnippet()));
+                        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
+                        ab.setTitle(marker.getTitle());
+                        ab.setView(msg);
+                        ab.setCancelable(true);
+                        ab.show();
 
-                map.moveCamera(center);
-                map.animateCamera(zoom);
+
+                        new FancyAlertDialog.Builder(getActivity())
+                                .setTitle(marker.getTitle())
+                                .setBackgroundColor(Color.parseColor("#303F9F"))  //Don't pass R.color.colorvalue
+                                .setMessage("Do you really want to Exit ?")
+                                .setPositiveBtnBackground(Color.parseColor("#FF4081"))  //Don't pass R.color.colorvalue
+                                .setPositiveBtnText("Rate")
+                                .setNegativeBtnBackground(Color.parseColor("#FFA9A7A8"))  //Don't pass R.color.colorvalue
+                                .setAnimation(Animation.POP)
+                                .isCancellable(true)
+                                .setIcon(R.drawable.ic_star_border_black_24dp, Icon.Visible)
+                                .OnPositiveClicked(new FancyAlertDialogListener() {
+                                    @Override
+                                    public void OnClick() {
+                                        Toast.makeText(getContext(),"Rate",Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .build();
+
+
+
+                        return false;
+                    }
+                });
                 //actualizamos el mapa cada minuto
                 Timer timer = new Timer();
                 TimerTask hourlyTask = new TimerTask() {
                     @Override
                     public void run() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                downloadFile(url_actualizar, archivo_actualizar);
-                            }
-                        });
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showContent();
+                                    downloadFile(url_actualizar, archivo_actualizar);
+                                    restartTimer();
+                                }
+                            });
+                        }
                     }
                 };
 
-                // schedule the task to run starting now and then every minute
-                timer.schedule(hourlyTask, 0l, 60000);
+                // schedule the task to run starting now and then every 20secs
+                timer.schedule(hourlyTask, 0l, 20000);
+
+
             }
         });
+    }
+
+    private void restartTimer() {
+        circleCountDownView.cancel();
+        circleCountDownView.start();
     }
 
     @Override
@@ -198,6 +274,7 @@ public class TransportMapFragment extends Fragment {
 
     public void downloadFile(final String url, final String name) {
         showLoading();
+
         final String path = getActivity().getFilesDir().getAbsolutePath();
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -215,12 +292,11 @@ public class TransportMapFragment extends Fragment {
                 .subscribe(new Observer<DownloadStatus>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        showLoading();
                     }
 
                     @Override
                     public void onNext(DownloadStatus downloadStatus) {
-
                     }
 
                     @Override
@@ -238,8 +314,10 @@ public class TransportMapFragment extends Fragment {
                                 KmlLayer layer = new KmlLayer(map, fileInputStream, getContext());
                                 map.clear();
                                 layer.addLayerToMap();
+
                                 zoomMap(map);
                                 primeraVez = false;
+
                                 showContent();
 
                             } catch (FileNotFoundException e) {
@@ -261,6 +339,7 @@ public class TransportMapFragment extends Fragment {
 
     }
 
+
     private void zoomMap(GoogleMap map) {
         CameraUpdate center =
                 CameraUpdateFactory.newLatLng(new LatLng(43.4722,
@@ -269,6 +348,7 @@ public class TransportMapFragment extends Fragment {
 
         map.moveCamera(center);
         map.animateCamera(zoom);
+        Log.d("ZOOM", "ZOOM");
     }
 
     public static OkHttpClient getUnsafeOkHttpClient() {
@@ -338,13 +418,7 @@ public class TransportMapFragment extends Fragment {
      * Method used to show the listView
      */
     public void showContent() {
-        CameraUpdate center =
-                CameraUpdateFactory.newLatLng(new LatLng(43.4722,
-                        -3.8199));
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(12);
 
-        map.moveCamera(center);
-        map.animateCamera(zoom);
         mapView.setVisibility(View.VISIBLE);
         loadingLayout.setVisibility(View.GONE);
         errorLayout.setVisibility(View.GONE);
@@ -354,12 +428,87 @@ public class TransportMapFragment extends Fragment {
 
     private void loadSpinnerToolbar() {
         //hay que componer el spinner selector de lineas
-        Constants constantes= new Constants();
+        Constants constantes = new Constants();
         List listaDescarga = constantes.lineas_mostrar;
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.spinner, listaDescarga);
         adapter.setDropDownViewResource(R.layout.spinner);
         linesSpinner.setVisibility(View.VISIBLE);
         linesSpinner.setAdapter(adapter);
+    }
+
+    private static final CharSequence[] MAP_TYPE_ITEMS =
+            {"Mapa",  "Satélite", "Terreno","Híbrido"};
+
+    private void showMapTypeSelectorDialog() {
+        // Prepare the dialog by setting up a Builder.
+        final String fDialogTitle = getActivity().getString(R.string.select_map);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(fDialogTitle);
+
+        // Find the current map type to pre-check the item representing the current state.
+        int checkItem = map.getMapType()-1;
+
+        // Add an OnClickListener to the dialog, so that the selection will be handled.
+        builder.setSingleChoiceItems(
+                MAP_TYPE_ITEMS,
+                checkItem,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int item) {
+                        // Locally create a finalised object.
+                        Log.d("DIALOG", String.valueOf(item));
+                        // Perform an action depending on which item was selected.
+                        switch (item) {
+                            case 0:
+                                map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                                break;
+                            case 1:
+                                map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                break;
+                            case 2:
+                                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                                break;
+                            case 3:
+                                map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                break;
+                            default:
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        // Build the dialog and show it.
+        AlertDialog fMapTypeDialog = builder.create();
+        fMapTypeDialog.setCanceledOnTouchOutside(true);
+        fMapTypeDialog.show();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Auto-generated method stub
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.map_change:
+                Log.d("AB", "MAP");
+                showMapTypeSelectorDialog();
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }
