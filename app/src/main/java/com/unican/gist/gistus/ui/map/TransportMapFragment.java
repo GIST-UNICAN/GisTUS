@@ -51,6 +51,8 @@ import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -184,12 +186,42 @@ public class TransportMapFragment extends Fragment {
                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
+                        //el bus del seta tiene que ir aparte es como un niño tonto
+                        String mostrar="";
+                        String line = Html.fromHtml(marker.getSnippet()).toString();
+                        if(marker.getTitle().equalsIgnoreCase("Vehiculo: 100")){
+                            Log.d("100",line);
+                            String pattern = "Linea(.*)estado(.*)Temperatura(.*)Humedad(.*)PM(.*)O3(.*)NO2(.*)";
+                            // Create a Pattern object
+                            Pattern r = Pattern.compile(pattern);
+                            // Now create matcher object.
+                            Matcher m = r.matcher(line);
 
+                            while(m.find()){
+                                mostrar= "Línea: "+m.group(1)+" \n"
+                                        + "Estado: "+ m.group(2)+" \n"
+                                        + "Temperatura: "+ m.group(3)+" \n"
+                                        + "Humedad: "+ m.group(4)
+                                        +" \n"+ "PM: "+ m.group(5)
+                                        +" \n"+ "O3: "+ m.group(6)
+                                        +" \n"+ "NO2: "+ m.group(7);
+                            }
+                        }
+                        else {
+                            String pattern = "^Linea(.*)estado(.*)";
+                            // Create a Pattern object
+                            Pattern r = Pattern.compile(pattern);
+                            // Now create matcher object.
+                            Matcher m = r.matcher(line);
+                            while(m.find()){
+                                mostrar= "Línea: "+m.group(1)+" \n"+ "Estado: "+ m.group(2);
+                            }
+                        }
 
                         new FancyAlertDialog.Builder(getActivity())
                                 .setTitle(marker.getTitle())
                                 .setBackgroundColor(Color.parseColor("#303F9F"))  //Don't pass R.color.colorvalue
-                                .setMessage(Html.fromHtml(marker.getSnippet()).toString())
+                                .setMessage(mostrar)
                                 .setPositiveBtnBackground(Color.parseColor("#FF4081"))  //Don't pass R.color.colorvalue
                                 .setNegativeBtnText("")
                                 .setPositiveBtnText("Cerrar")
@@ -481,7 +513,6 @@ public class TransportMapFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Auto-generated method stub
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu, menu);
     }
@@ -491,7 +522,6 @@ public class TransportMapFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.map_change:
-                Log.d("AB", "MAP");
                 showMapTypeSelectorDialog();
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
