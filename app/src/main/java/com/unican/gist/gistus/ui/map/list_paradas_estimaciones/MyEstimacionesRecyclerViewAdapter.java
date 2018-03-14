@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.unican.gist.gistus.R;
 import com.unican.gist.gistus.domain.Estimaciones;
 import com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment.OnListFragmentInteractionListener;
-import com.unican.gist.gistus.domain.Estimaciones.EstimacionElemento;
 
 import java.util.List;
 
@@ -33,9 +32,9 @@ public class MyEstimacionesRecyclerViewAdapter extends RecyclerView.Adapter<MyEs
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = estimacionesList.get(position);
-        holder.mIdView.setText(estimacionesList.get(position).id);
-        holder.mContentView.setText(estimacionesList.get(position).content);
+        holder.titulo.setText( estimacionesList.get(position).linea_destino);
+        holder.minutos.setText(String.valueOf(estimacionesList.get(position).minutos));
+        holder.metros.setText(String.valueOf(estimacionesList.get(position).metros));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,7 +42,7 @@ public class MyEstimacionesRecyclerViewAdapter extends RecyclerView.Adapter<MyEs
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(holder.elementoEstimacion);
                 }
             }
         });
@@ -64,14 +63,14 @@ public class MyEstimacionesRecyclerViewAdapter extends RecyclerView.Adapter<MyEs
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            minutos = (TextView) view.findViewById(R.id.);
-            metros = (TextView) view.findViewById(R.id.content);
-            titulo = (TextView) view.findViewById(R.id.content);
+            minutos = (TextView) view.findViewById(R.id.tiempo_rellena);
+            metros = (TextView) view.findViewById(R.id.distancia_rellena);
+            titulo = (TextView) view.findViewById(R.id.linea_destino);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '"  + "'";
         }
     }
 }

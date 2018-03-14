@@ -10,11 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.unican.gist.gistus.R;
+import com.unican.gist.gistus.domain.Estimaciones;
 import com.unican.gist.gistus.ui.map.ParadasFragment;
 import com.unican.gist.gistus.ui.map.TransportMapFragment;
+import com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment;
+
+import java.util.List;
 
 public class
-MainActivity extends AppCompatActivity {
+MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFragment, EstimacionesFragment.OnListFragmentInteractionListener {
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
 
@@ -56,5 +60,17 @@ MainActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    @Override
+    public void OnFragmentEstimaciones(List estimaciones) {
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_content, new EstimacionesFragment(estimaciones)).commit();
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(Estimaciones item) {
+
     }
 }

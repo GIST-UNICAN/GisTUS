@@ -3,6 +3,7 @@ package com.unican.gist.gistus.ui.map;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -42,7 +43,12 @@ import com.shashank.sony.fancydialoglib.FancyAlertDialogListener;
 import com.shashank.sony.fancydialoglib.Icon;
 import com.unican.gist.gistus.R;
 import com.unican.gist.gistus.domain.Constants;
+import com.unican.gist.gistus.domain.Estimaciones;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
@@ -50,6 +56,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -159,58 +166,31 @@ public class ParadasFragment extends Fragment {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         //el bus del seta tiene que ir aparte es como un niño tonto
-                        String mostrar="";
-                        String line = marker.getSnippet().toString();
-                        Log.d("line",line);
-                        if(marker.getTitle().equalsIgnoreCase("Vehiculo: 100")){
-                            Log.d("100",line);
-                            String pattern = "Linea(.*)estado(.*)Temperatura(.*)Humedad(.*)PM(.*)O3(.*)NO2(.*)";
-                            // Create a Pattern object
-                            Pattern r = Pattern.compile(pattern);
-                            // Now create matcher object.
-                            Matcher m = r.matcher(line);
+                        String mostrar = "";
+                        String html = marker.getSnippet().toString();
+                        List<Estimaciones> estimacionesList = new ArrayList<>();
+                        String linea;
+                        Integer espera;
+                        Integer distancia;
+                        Document doc = Jsoup.parse(html);
+                        Elements rows = doc.getElementsByTag("tr");
+                        rows=rows.get(1).getElementsByTag("tr");
+                        Log.d("numero",String.valueOf(rows.size()).toString());
+                        Boolean primera=true;
+                        for (Element row : rows) {
+                            if(!primera) {
+                                Elements columns = row.getElementsByTag("td");
+                                Log.d("ele", columns.toString());
 
-                            while(m.find()){
-                                mostrar= "Línea: "+m.group(1)+" \n"
-                                        + "Estado: "+ m.group(2)+" \n"
-                                        + "Temperatura: "+ m.group(3)+" \n"
-                                        + "Humedad: "+ m.group(4)
-                                        +" \n"+ "PM: "+ m.group(5)
-                                        +" \n"+ "O3: "+ m.group(6)
-                                        +" \n"+ "NO2: "+ m.group(7);
+                                linea = columns.get(0).text();
+                                espera = Integer.parseInt(columns.get(1).text());
+                                distancia = Integer.parseInt(columns.get(2).text());
+                                estimacionesList.add(new Estimaciones(linea, espera, distancia));
                             }
+                            primera=false;
+
                         }
-                        else {
-                            String pattern = "^Linea(.*)estado(.*)";
-                            // Create a Pattern object
-                            Pattern r = Pattern.compile(pattern);
-                            // Now create matcher object.
-                            Matcher m = r.matcher(line);
-                            while(m.find()){
-                                mostrar= "Línea: "+m.group(1)+" \n"+ "Estado: "+ m.group(2);
-                            }
-                        }
-
-                        new FancyAlertDialog.Builder(getActivity())
-                                .setTitle(marker.getTitle())
-                                .setBackgroundColor(Color.parseColor("#303F9F"))  //Don't pass R.color.colorvalue
-                                .setMessage(mostrar)
-                                .setPositiveBtnBackground(Color.parseColor("#FF4081"))  //Don't pass R.color.colorvalue
-                                .setNegativeBtnText("")
-                                .setPositiveBtnText("Cerrar")
-                                .setNegativeBtnBackground(Color.parseColor("#ffffff"))  //Don't pass R.color.colorvalue
-                                .setAnimation(Animation.POP)
-                                .isCancellable(false)
-                                .setIcon(R.drawable.ic_info, Icon.Visible)
-                                .OnPositiveClicked(new FancyAlertDialogListener() {
-                                    @Override
-                                    public void OnClick() {
-                                        downloadFile(url_actualizar, archivo_actualizar);
-                                    }
-                                })
-                                .build();
-
-
+                        fragmentFromFragmentListener.OnFragmentEstimaciones(estimacionesList);
                         return false;
                     }
                 });
@@ -423,7 +403,6 @@ public class ParadasFragment extends Fragment {
     }
 
 
-
     private static final CharSequence[] MAP_TYPE_ITEMS =
             {"Mapa", "Satélite", "Terreno", "Híbrido"};
 
@@ -474,7 +453,6 @@ public class ParadasFragment extends Fragment {
     }
 
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -492,9 +470,27 @@ public class ParadasFragment extends Fragment {
 
         }
     }
+
     @Override
     public void onCreateOptionsMenu(
             Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
+    }
+
+    public interface FragmentFromFragment {
+        void OnFragmentEstimaciones(List estimaciones);
+    }
+
+    ParadasFragment.FragmentFromFragment fragmentFromFragmentListener;
+
+    @Override
+    public void onAttach(Context context) {
+        //give a context to the calls from other activities
+        super.onAttach(context);
+        if (context instanceof ParadasFragment.FragmentFromFragment) {
+            fragmentFromFragmentListener = (ParadasFragment.FragmentFromFragment) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implements  MainScreenFragment.OnNewSurveyClicked");
+        }
     }
 }

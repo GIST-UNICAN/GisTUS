@@ -3,6 +3,7 @@ package com.unican.gist.gistus.ui.map;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -191,34 +192,33 @@ public class TransportMapFragment extends Fragment {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         //el bus del seta tiene que ir aparte es como un niño tonto
-                        String mostrar="";
+                        String mostrar = "";
                         String line = Html.fromHtml(marker.getSnippet()).toString();
-                        if(marker.getTitle().equalsIgnoreCase("Vehiculo: 100")){
-                            Log.d("100",line);
+                        if (marker.getTitle().equalsIgnoreCase("Vehiculo: 100")) {
+                            Log.d("100", line);
                             String pattern = "Linea(.*)estado(.*)Temperatura(.*)Humedad(.*)PM(.*)O3(.*)NO2(.*)";
                             // Create a Pattern object
                             Pattern r = Pattern.compile(pattern);
                             // Now create matcher object.
                             Matcher m = r.matcher(line);
 
-                            while(m.find()){
-                                mostrar= "Línea: "+m.group(1)+" \n"
-                                        + "Estado: "+ m.group(2)+" \n"
-                                        + "Temperatura: "+ m.group(3)+" \n"
-                                        + "Humedad: "+ m.group(4)
-                                        +" \n"+ "PM: "+ m.group(5)
-                                        +" \n"+ "O3: "+ m.group(6)
-                                        +" \n"+ "NO2: "+ m.group(7);
+                            while (m.find()) {
+                                mostrar = "Línea: " + m.group(1) + " \n"
+                                        + "Estado: " + m.group(2) + " \n"
+                                        + "Temperatura: " + m.group(3) + " \n"
+                                        + "Humedad: " + m.group(4)
+                                        + " \n" + "PM: " + m.group(5)
+                                        + " \n" + "O3: " + m.group(6)
+                                        + " \n" + "NO2: " + m.group(7);
                             }
-                        }
-                        else {
+                        } else {
                             String pattern = "^Linea(.*)estado(.*)";
                             // Create a Pattern object
                             Pattern r = Pattern.compile(pattern);
                             // Now create matcher object.
                             Matcher m = r.matcher(line);
-                            while(m.find()){
-                                mostrar= "Línea: "+m.group(1)+" \n"+ "Estado: "+ m.group(2);
+                            while (m.find()) {
+                                mostrar = "Línea: " + m.group(1) + " \n" + "Estado: " + m.group(2);
                             }
                         }
 
@@ -538,5 +538,7 @@ public class TransportMapFragment extends Fragment {
 
         }
     }
+
+
 
 }
