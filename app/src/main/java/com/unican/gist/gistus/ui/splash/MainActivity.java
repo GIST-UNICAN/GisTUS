@@ -10,12 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.unican.gist.gistus.R;
+import com.unican.gist.gistus.ui.map.ParadasFragment;
 import com.unican.gist.gistus.ui.map.TransportMapFragment;
 
 public class
 MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +29,32 @@ MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         myToolbar.setTitle(R.string.app_name);
         myToolbar.setTitleTextColor(getApplication().getResources().getColor(R.color.white));
-        ActionBar ab =getSupportActionBar();
+        ActionBar ab = getSupportActionBar();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_content, new TransportMapFragment()).commit();
-}
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.map_buses:
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_content, new TransportMapFragment()).commit();
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return false;
+            case R.id.map_stops:
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.main_content, new ParadasFragment()).commit();
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return false;
+            default:
+                return false;
+
+
+
+        }
+    }
 }

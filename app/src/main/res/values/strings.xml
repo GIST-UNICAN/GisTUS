@@ -13,5 +13,7 @@
     <string name="refresco">Actualizando</string>
     <string name="change_map">Cambiar mapa</string>
     <string name="select_map">Seleccionar tipo de mapa</string>
+    <string name="minutos">Minutos restantes</string>
+    <string name="metros">Distancia del bus</string>
 
 </resources>

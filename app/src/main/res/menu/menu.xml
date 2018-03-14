@@ -8,6 +8,16 @@
         android:icon="@drawable/ic_action_name"
         android:title="@string/change_map"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/map_buses"
+        android:icon="@drawable/ic_bus"
+        android:title="@string/change_map"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/map_stops"
+        android:icon="@drawable/ic_stup_bus"
+        android:title="@string/change_map"
+        app:showAsAction="ifRoom"/>
 
     <!-- Settings, should always be in the overflow -->
 

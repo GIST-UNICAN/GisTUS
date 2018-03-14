@@ -25,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -64,7 +63,6 @@ import javax.net.ssl.X509TrustManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -80,14 +78,13 @@ import static android.content.ContentValues.TAG;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TransportMapFragment extends Fragment {
+public class ParadasFragment extends Fragment {
 
     private MapView mapView;
     private GoogleMap map;
     private Boolean primeraVez = true;
-    private String url_actualizar = "espiras/programa_ejecutar/lineas_bus.kml";
+    private String url_actualizar = "espiras/programa_ejecutar/estimacion_paradas.kml";
     private String archivo_actualizar = "archivo.kml";
-    private String xml_lineas = "espiras/programa_ejecutar/xml_lineas_bus.xml";
 
     @Nullable
     @BindView(R.id.loading_layout)
@@ -97,16 +94,13 @@ public class TransportMapFragment extends Fragment {
     @BindView(R.id.error_layout)
     LinearLayout errorLayout;
 
-    @Nullable
-    @BindView(R.id.lines_spinner)
-    Spinner linesSpinner;
 
     @Nullable
     @BindView(R.id.circleCountDownView)
     ContinuableCircleCountDownView circleCountDownView;
 
 
-    public TransportMapFragment() {
+    public ParadasFragment() {
         // Required empty public constructor
     }
 
@@ -114,50 +108,24 @@ public class TransportMapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_transport_map, null);
+        View view = inflater.inflate(R.layout.paradas, null);
         ButterKnife.bind(this, view);
-        loadSpinnerToolbar();
         mapView = (MapView) view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         //listener para el refresco, aunque no se usa
         circleCountDownView.setListener(new ContinuableCircleCountDownView.OnCountDownCompletedListener() {
             @Override
             public void onTick(long passedMillis) {
-                Log.w(TAG, "Tick." + passedMillis);
+
             }
 
             @Override
             public void onCompleted() {
-                Log.w(TAG, "Completed.");
+
             }
         });
-        circleCountDownView.setTimer(20000);
+        circleCountDownView.setTimer(60000);
         circleCountDownView.start();
-        //capturamos el spinner
-        linesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.white));
-                if (!primeraVez) {
-                    if (linesSpinner.getSelectedItem().toString().equalsIgnoreCase("Todas las Líneas")) {
-                        downloadFile("espiras/programa_ejecutar/lineas_bus.kml", "archivo.kml");
-                        url_actualizar = "espiras/programa_ejecutar/lineas_bus.kml";
-                        archivo_actualizar = "archivo.kml";
-                    } else {
-                        downloadFile("espiras/programa_ejecutar/lineas_bus_" + linesSpinner.getSelectedItem().toString() + ".kml", linesSpinner.getSelectedItem().toString() + ".kml");
-                        url_actualizar = "espiras/programa_ejecutar/lineas_bus_" + linesSpinner.getSelectedItem().toString() + ".kml";
-                        archivo_actualizar = linesSpinner.getSelectedItem().toString() + ".kml";
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        Log.d("AB", ab.getTitle().toString());
         setHasOptionsMenu(true);
         return view;
 
@@ -185,14 +153,15 @@ public class TransportMapFragment extends Fragment {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 map = mMap;
-
+                zoomMap(map);
                 //hacemos los markes clickables
                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         //el bus del seta tiene que ir aparte es como un niño tonto
                         String mostrar="";
-                        String line = Html.fromHtml(marker.getSnippet()).toString();
+                        String line = marker.getSnippet().toString();
+                        Log.d("line",line);
                         if(marker.getTitle().equalsIgnoreCase("Vehiculo: 100")){
                             Log.d("100",line);
                             String pattern = "Linea(.*)estado(.*)Temperatura(.*)Humedad(.*)PM(.*)O3(.*)NO2(.*)";
@@ -264,7 +233,7 @@ public class TransportMapFragment extends Fragment {
                 };
 
                 // schedule the task to run starting now and then every 20secs
-                timer.schedule(hourlyTask, 0l, 20000);
+                timer.schedule(hourlyTask, 0l, 60000);
 
 
             }
@@ -344,7 +313,7 @@ public class TransportMapFragment extends Fragment {
                                 map.clear();
                                 layer.addLayerToMap();
 
-                                zoomMap(map);
+
                                 primeraVez = false;
 
                                 showContent();
@@ -437,7 +406,6 @@ public class TransportMapFragment extends Fragment {
      * Method used to show the loading view
      */
     public void showLoading() {
-        linesSpinner.setVisibility(View.GONE);
         loadingLayout.setVisibility(View.VISIBLE);
         mapView.setVisibility(View.GONE);
         errorLayout.setVisibility(View.GONE);
@@ -451,20 +419,10 @@ public class TransportMapFragment extends Fragment {
         mapView.setVisibility(View.VISIBLE);
         loadingLayout.setVisibility(View.GONE);
         errorLayout.setVisibility(View.GONE);
-        linesSpinner.setVisibility(View.VISIBLE);
 
     }
 
-    private void loadSpinnerToolbar() {
-        //hay que componer el spinner selector de lineas
-        Constants constantes = new Constants();
-        List listaDescarga = constantes.lineas_mostrar;
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.spinner, listaDescarga);
-        adapter.setDropDownViewResource(R.layout.spinner);
-        linesSpinner.setVisibility(View.VISIBLE);
-        linesSpinner.setAdapter(adapter);
-    }
 
     private static final CharSequence[] MAP_TYPE_ITEMS =
             {"Mapa", "Satélite", "Terreno", "Híbrido"};
@@ -515,11 +473,7 @@ public class TransportMapFragment extends Fragment {
         fMapTypeDialog.show();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu, menu);
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -538,5 +492,9 @@ public class TransportMapFragment extends Fragment {
 
         }
     }
-
+    @Override
+    public void onCreateOptionsMenu(
+            Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+    }
 }
