@@ -1,4 +1,4 @@
-package com.unican.gist.gistus.domain;
+package com.unican.gist.gistus.domain.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

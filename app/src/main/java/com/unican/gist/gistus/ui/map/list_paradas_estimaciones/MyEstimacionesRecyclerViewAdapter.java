@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.unican.gist.gistus.R;
-import com.unican.gist.gistus.domain.Estimaciones;
+import com.unican.gist.gistus.domain.Objects.Estimaciones;
 import com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment.OnListFragmentInteractionListener;
 
 import java.util.List;

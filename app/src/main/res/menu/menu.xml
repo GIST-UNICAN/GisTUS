@@ -4,10 +4,16 @@
 
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
+        android:id="@+id/stop_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/change_map"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/map_change"
         android:icon="@drawable/ic_action_name"
         android:title="@string/change_map"
         app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/map_buses"
         android:icon="@drawable/ic_bus"

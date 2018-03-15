@@ -1,4 +1,4 @@
-package com.unican.gist.gistus.domain;
+package com.unican.gist.gistus.domain.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +10,8 @@ import java.util.List;
 
 public class Constants {
     public Constants(){}
+    public static final String URL_SERVER = "http://193.144.208.142:8080/";
+
     public String google_api_key="";
     public String generic_url_kml_directory="";
     public List lineas_mostrar= Arrays.asList(
