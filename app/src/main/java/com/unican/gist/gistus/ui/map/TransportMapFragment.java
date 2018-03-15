@@ -540,5 +540,4 @@ public class TransportMapFragment extends Fragment {
     }
 
 
-
 }

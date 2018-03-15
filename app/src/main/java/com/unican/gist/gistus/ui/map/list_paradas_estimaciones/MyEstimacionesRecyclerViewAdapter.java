@@ -33,8 +33,9 @@ public class MyEstimacionesRecyclerViewAdapter extends RecyclerView.Adapter<MyEs
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.titulo.setText( estimacionesList.get(position).linea_destino);
-        holder.minutos.setText(String.valueOf(estimacionesList.get(position).minutos));
-        holder.metros.setText(String.valueOf(estimacionesList.get(position).metros));
+        holder.minutos.setText(String.valueOf(estimacionesList.get(position).minutos/60));
+        String metros=String.valueOf(estimacionesList.get(position).metros)+" metros";
+        holder.metros.setText(metros);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

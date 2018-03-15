@@ -174,11 +174,11 @@ public class ParadasFragment extends Fragment {
                         Integer distancia;
                         Document doc = Jsoup.parse(html);
                         Elements rows = doc.getElementsByTag("tr");
-                        rows=rows.get(1).getElementsByTag("tr");
-                        Log.d("numero",String.valueOf(rows.size()).toString());
-                        Boolean primera=true;
+                        rows = rows.get(1).getElementsByTag("tr");
+                        Log.d("numero", String.valueOf(rows.size()).toString());
+                        Boolean primera = true;
                         for (Element row : rows) {
-                            if(!primera) {
+                            if (!primera) {
                                 Elements columns = row.getElementsByTag("td");
                                 Log.d("ele", columns.toString());
 
@@ -187,10 +187,10 @@ public class ParadasFragment extends Fragment {
                                 distancia = Integer.parseInt(columns.get(2).text());
                                 estimacionesList.add(new Estimaciones(linea, espera, distancia));
                             }
-                            primera=false;
+                            primera = false;
 
                         }
-                        fragmentFromFragmentListener.OnFragmentEstimaciones(estimacionesList);
+                        fragmentFromFragmentListener.OnFragmentEstimaciones(estimacionesList, marker.getTitle());
                         return false;
                     }
                 });
@@ -461,7 +461,7 @@ public class ParadasFragment extends Fragment {
                 showMapTypeSelectorDialog();
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
-                return true;
+                return false;
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -478,7 +478,7 @@ public class ParadasFragment extends Fragment {
     }
 
     public interface FragmentFromFragment {
-        void OnFragmentEstimaciones(List estimaciones);
+        void OnFragmentEstimaciones(List estimaciones, String nombreParada);
     }
 
     ParadasFragment.FragmentFromFragment fragmentFromFragmentListener;

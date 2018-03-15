@@ -1,15 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
     android:name="com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context="com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment"
-    tools:listitem="@layout/fragment_estimaciones" >
+    android:orientation="vertical">
 
-</android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:id="@+id/linearparadas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:elevation="8dp"
+        android:background="@color/blueStress"
+        android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tituloparadamostrar"
+            android:layout_width="match_parent"
+            android:textColor="@color/white"
+            android:textSize="@dimen/letra_mediana"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAlignment="center" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="7"
+        android:paddingVertical="10dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.unican.gist.gistus.ui.map.list_paradas_estimaciones.EstimacionesFragment"
+        tools:listitem="@layout/fragment_estimaciones">
+
+
+    </android.support.v7.widget.RecyclerView>
+</LinearLayout>

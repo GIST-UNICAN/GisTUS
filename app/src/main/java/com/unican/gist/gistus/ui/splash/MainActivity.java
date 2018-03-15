@@ -34,6 +34,7 @@ MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFr
         myToolbar.setTitle(R.string.app_name);
         myToolbar.setTitleTextColor(getApplication().getResources().getColor(R.color.white));
         ActionBar ab = getSupportActionBar();
+        ab.setHomeButtonEnabled(true);
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_content, new TransportMapFragment()).commit();
     }
@@ -63,14 +64,20 @@ MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFr
     }
 
     @Override
-    public void OnFragmentEstimaciones(List estimaciones) {
+    public void OnFragmentEstimaciones(List estimaciones, String titulo_parada) {
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_content, new EstimacionesFragment(estimaciones)).commit();
+        fragmentTransaction.replace(R.id.main_content, new EstimacionesFragment(estimaciones, titulo_parada)).commit();
 
     }
 
     @Override
     public void onListFragmentInteraction(Estimaciones item) {
 
+    }
+
+    @Override
+    public void obBackPressed() {
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_content, new ParadasFragment()).commit();
     }
 }
