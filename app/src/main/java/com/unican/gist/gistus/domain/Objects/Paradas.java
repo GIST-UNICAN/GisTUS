@@ -1,17 +1,16 @@
 package com.unican.gist.gistus.domain.Objects;
 
-import ir.mirrajabi.searchdialog.core.Searchable;
 
 /**
  * Created by Andres on 15/03/2018.
  */
 
-public class Paradas implements Searchable {
-    private String mTitle;
+public class Paradas  {
+    private String title;
     private Integer id;
 
     public Paradas(String title, Integer paradaId) {
-        mTitle = title;
+        this.title = title;
         this.id = paradaId;
     }
 
@@ -24,8 +23,11 @@ public class Paradas implements Searchable {
         this.id = id;
     }
 
-    @Override
     public String getTitle() {
-        return null;
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

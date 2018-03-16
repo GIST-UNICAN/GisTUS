@@ -6,7 +6,7 @@
     <item
         android:id="@+id/stop_search"
         android:icon="@drawable/ic_search"
-        android:title="@string/change_map"
+        android:title="@string/buscar"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/map_change"
@@ -17,12 +17,12 @@
     <item
         android:id="@+id/map_buses"
         android:icon="@drawable/ic_bus"
-        android:title="@string/change_map"
+        android:title="@string/mapa_buses"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/map_stops"
         android:icon="@drawable/ic_stup_bus"
-        android:title="@string/change_map"
+        android:title="@string/mapa_paradas"
         app:showAsAction="ifRoom"/>
 
     <!-- Settings, should always be in the overflow -->

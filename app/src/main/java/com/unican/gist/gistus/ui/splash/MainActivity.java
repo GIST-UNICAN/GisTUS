@@ -9,8 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.ajithvgiri.searchdialog.OnSearchItemSelected;
+import com.ajithvgiri.searchdialog.SearchListItem;
+import com.ajithvgiri.searchdialog.SearchableDialog;
 import com.unican.gist.gistus.R;
 import com.unican.gist.gistus.domain.DownloadEstimecionesUSECASE;
+import com.unican.gist.gistus.domain.Objects.AllStops;
 import com.unican.gist.gistus.domain.Objects.Estimaciones;
 import com.unican.gist.gistus.domain.Objects.EstimacionesList;
 import com.unican.gist.gistus.domain.Objects.Paradas;
@@ -23,14 +27,13 @@ import java.util.List;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
-import ir.mirrajabi.searchdialog.SimpleSearchDialogCompat;
-import ir.mirrajabi.searchdialog.core.BaseSearchDialogCompat;
-import ir.mirrajabi.searchdialog.core.SearchResultListener;
+
 
 public class
 MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFragment, EstimacionesFragment.OnListFragmentInteractionListener {
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
+    private String tituloParada="PARADA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +69,17 @@ MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFr
                 // as a favorite...
                 return false;
             case R.id.stop_search:
-                new SimpleSearchDialogCompat(this, "Busca parada...",
-                        "Introduce nombre o id", null, getParadas(),
-                        new SearchResultListener<Paradas>() {
-                            @Override
-                            public void onSelected(BaseSearchDialogCompat dialog,
-                                                   Paradas item, int position) {
-                                new DownloadEstimecionesUSECASE(String.valueOf(item.getId())).execute(new MainActivity.getEstimaciones());
-                                Toast.makeText(MainActivity.this, item.getTitle(),
-                                        Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            }
-                        }).show();
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                SearchableDialog searchableDialog = new SearchableDialog(this, getParadas(), "Title");
+                searchableDialog.show();
+                searchableDialog.setOnItemSelected(new OnSearchItemSelected() {
+                    @Override
+                    public void onClick(int i, SearchListItem searchListItem) {
+                        tituloParada=searchListItem.getTitle();
+                        new DownloadEstimecionesUSECASE(String.valueOf(searchListItem.getId())).execute(new MainActivity.getEstimaciones());
+                    }
+                });
+
+
                 return false;
             default:
                 return false;
@@ -89,10 +89,9 @@ MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFr
         }
     }
 
-    private ArrayList getParadas() {
-        ArrayList<Paradas> paradasList= new ArrayList<>();
-        paradasList.add(new Paradas("Los ciruelos 44",1));
-        return paradasList;
+    private List<SearchListItem> getParadas() {
+        AllStops allStops= new AllStops();
+        return allStops.devuelveLista();
     }
 
 
@@ -133,7 +132,7 @@ MainActivity extends AppCompatActivity implements ParadasFragment.FragmentFromFr
                 estimacionesListMandar.add(new Estimaciones(estimacion.linea_destino+" a "+estimacion.destino,estimacion.minutos,estimacion.metros));
             }
             fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.main_content, new EstimacionesFragment(estimacionesListMandar, "LINEA")).commit();
+            fragmentTransaction.replace(R.id.main_content, new EstimacionesFragment(estimacionesListMandar, tituloParada)).commit();
         }
 
         @Override

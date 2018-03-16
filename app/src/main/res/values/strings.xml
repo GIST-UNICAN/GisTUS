@@ -15,5 +15,8 @@
     <string name="select_map">Seleccionar tipo de mapa</string>
     <string name="minutos">Minutos restantes</string>
     <string name="metros">Distancia del bus</string>
+    <string name="mapa_buses">Posicion autobuses</string>
+    <string name="mapa_paradas">Mapa paradas</string>
+    <string name="buscar">Buscar</string>
 
 </resources>
